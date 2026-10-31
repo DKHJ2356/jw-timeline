@@ -3,6 +3,8 @@
 {
   "name": "jw-timeline",
   "compatibility_date": "2026-10-01",
+  // Runs before `wrangler deploy`, so the site builds even if no build command is set in the dashboard.
+  "build": { "command": "npm run build" },
   "assets": {
     "directory": "./out",
     "not_found_handling": "404-page"

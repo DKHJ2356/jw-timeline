@@ -55,11 +55,11 @@ static export and needs no server runtime.
 
 ### Deploying as a Cloudflare Worker (Workers & Pages → Create application)
 
-`wrangler.jsonc` serves `./out` as static assets, so `npx wrangler deploy` works once the site
-is built. In the Worker's **Settings → Build**:
+`wrangler.jsonc` runs `npm run build` itself and then serves `./out` as static assets, so
+`npx wrangler deploy` works with no separate build command. In the Worker's **Settings → Build**:
 
 - Git branch: the branch that holds this code (`main` only after `nextjs-port` is merged)
-- Build command: `npm run build`
+- Build command: leave empty (setting `npm run build` also works, it just builds twice)
 - Deploy command: `npx wrangler deploy` (default)
 - The Worker's name must match `name` in `wrangler.jsonc` (`jw-timeline`).
 
