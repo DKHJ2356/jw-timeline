@@ -1,0 +1,539 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg: #f8fafc;
+  --fg: #0f172a;
+  --panel: #ffffffd9;
+  --panel-solid: #ffffff;
+  --line: #cbd5e1;
+  --accent: #0891b2;
+  --muted: #64748b;
+  --primary: #07815f;
+  --danger: #b91c1c;
+  --axis: #f97316;
+  --now: #059669;
+  --section: #ffffff63;
+  --field: #ffffffa6;
+  --header-h: 60px;
+  --ruler-h: 44px;
+}
+
+.dark {
+  --bg: #101418;
+  --fg: #f8fafc;
+  --panel: #17202ad9;
+  --panel-solid: #17202a;
+  --line: #334155;
+  --muted: #94a3b8;
+  --section: #1e293b70;
+  --field: #0f172aaa;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-panel: var(--panel);
+  --color-panel-solid: var(--panel-solid);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-danger: var(--danger);
+  --color-section: var(--section);
+  --color-field: var(--field);
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 14px/1.4 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    -webkit-text-size-adjust: 100%;
+    /* The page itself never zooms; pinch is handled by the timeline. */
+    touch-action: pan-x pan-y;
+    overscroll-behavior: none;
+  }
+  body {
+    overflow: hidden;
+  }
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+  button {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: default;
+    opacity: 0.55;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--panel);
+    font-weight: 750;
+    white-space: nowrap;
+    user-select: none;
+  }
+  .btn:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--accent) 10%, var(--panel));
+  }
+  .btn-primary {
+    background: var(--primary);
+    border-color: transparent;
+    color: #fff;
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--primary) 88%, #000);
+  }
+  .btn-danger {
+    background: var(--danger);
+    border-color: transparent;
+    color: #fff;
+  }
+  .btn-danger:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--danger) 88%, #000);
+  }
+  .btn-active {
+    background: var(--accent) !important;
+    border-color: transparent;
+    color: #fff !important;
+  }
+  .field-input {
+    width: 100%;
+    min-height: 44px;
+    padding: 9px 11px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--field);
+  }
+  .section {
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 17px;
+    background: var(--section);
+  }
+  .label {
+    display: grid;
+    gap: 6px;
+    font-weight: 700;
+  }
+  .muted {
+    color: var(--muted);
+  }
+}
+
+/* ---- timeline ----------------------------------------------------------- */
+
+.tl-scroll {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+  cursor: grab;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
+}
+.tl-canvas {
+  position: relative;
+  background: var(--bg);
+}
+.tl-content {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+}
+.tl-content.gesturing {
+  will-change: transform;
+}
+.tl-axis {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--axis);
+}
+.tl-tick {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-left: 1px solid var(--line);
+}
+.tl-tick span {
+  position: absolute;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 800;
+}
+.tl-tick.current {
+  border-left: 3px solid var(--now);
+}
+.tl-tick.current span {
+  background: var(--now);
+  color: #fff;
+  border-radius: 6px;
+  padding: 3px 6px;
+}
+
+.tl-item {
+  position: absolute;
+  z-index: 4;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  transition: top 0.16s ease, opacity 0.12s ease;
+}
+.tl-item.float-replaced {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+.tl-person {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+}
+.tl-avatar {
+  flex: 0 0 58px;
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border: 3px solid var(--c);
+  border-radius: 50%;
+  background: var(--bg);
+  font-size: 22px;
+  font-weight: 900;
+  overflow: hidden;
+}
+.tl-avatar img,
+.tl-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.tl-copy {
+  display: grid;
+}
+.tl-copy b {
+  font-size: 14px;
+  white-space: nowrap;
+}
+.tl-copy small {
+  font-size: 10px;
+  white-space: nowrap;
+}
+.tl-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--c);
+  border-radius: 10px;
+  background: var(--panel);
+  white-space: nowrap;
+  font-weight: 700;
+}
+.tl-thumb {
+  width: 46px;
+  height: 46px;
+  border: 3px solid var(--c);
+  border-radius: 9px;
+  overflow: hidden;
+}
+.tl-line {
+  position: absolute;
+  z-index: 2;
+  height: 5px;
+  border-radius: 99px;
+  background: var(--c);
+  transition: top 0.16s ease;
+  pointer-events: none;
+}
+.tl-line.ongoing {
+  height: 7px;
+  background-image: radial-gradient(circle, #111827 0 2px, transparent 2.5px);
+  background-size: 14px 7px;
+}
+
+.tl-marker {
+  position: absolute;
+  z-index: 8;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  padding: 0;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: var(--event-colour);
+  box-shadow: 0 0 0 2px var(--person-colour), 0 4px 10px #0003;
+  transition: top 0.16s ease, scale 0.12s ease;
+}
+.tl-marker:hover,
+.tl-marker:focus-visible {
+  scale: 1.15;
+  z-index: 12;
+}
+/* Invisible larger hit area so the small dot is still a comfortable tap target. */
+.tl-marker::before,
+.tl-endpoint::before {
+  content: '';
+  position: absolute;
+  inset: -13px;
+  border-radius: 50%;
+}
+.tl-marker-label {
+  position: absolute;
+  left: 50%;
+  top: 23px;
+  transform: translateX(-50%);
+  max-width: 160px;
+  padding: 3px 7px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--fg);
+  font-size: 9px;
+  font-weight: 850;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 3px 10px #0002;
+  pointer-events: none;
+}
+.tl-marker.photo {
+  width: 42px;
+  height: 42px;
+  margin: -21px 0 0 -21px;
+  z-index: 11;
+}
+.tl-marker.photo img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.tl-marker.photo .tl-marker-label {
+  top: 49px;
+  max-width: 190px;
+  font-size: 10px;
+  padding: 4px 8px;
+}
+.tl-marker.shared {
+  overflow: hidden;
+  z-index: 10;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 900;
+  box-shadow: 0 0 0 2px var(--event-colour), 0 4px 10px #0003;
+}
+.tl-marker.shared.expanded {
+  width: 42px;
+  height: 42px;
+  margin: -21px 0 0 -21px;
+  font-size: 16px;
+  z-index: 12;
+}
+.tl-marker.shared img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+.tl-shared-label {
+  position: absolute;
+  z-index: 9;
+  translate: -50% 25px;
+  max-width: 190px;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  box-shadow: 0 3px 10px #0002;
+}
+.tl-connector {
+  position: absolute;
+  z-index: 5;
+  width: 3px;
+  margin-left: -1.5px;
+  border-radius: 999px;
+  background: var(--event-colour);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8);
+  pointer-events: none;
+}
+.tl-endpoint {
+  position: absolute;
+  z-index: 11;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  padding: 0;
+  border: 3px solid var(--event-colour);
+  border-radius: 50%;
+  background: var(--person-colour);
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.18);
+}
+.tl-endpoint:hover,
+.tl-endpoint:focus-visible {
+  scale: 1.2;
+}
+@media (pointer: coarse) {
+  .tl-marker.photo,
+  .tl-marker.shared.expanded {
+    width: 46px;
+    height: 46px;
+    margin: -23px 0 0 -23px;
+  }
+  .tl-marker.photo .tl-marker-label {
+    top: 53px;
+  }
+  .tl-shared-label {
+    translate: -50% 27px;
+  }
+}
+
+/* Floating labels: a zero-width sticky column, so they follow the left edge without JS per frame. */
+.tl-sticky {
+  position: sticky;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  z-index: 20;
+}
+.tl-float-label {
+  position: absolute;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  max-width: min(260px, 70vw);
+  min-height: 44px;
+  padding: 4px 10px 4px 4px;
+  transform: translateY(-50%);
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--panel-solid);
+  box-shadow: 0 6px 18px #0003;
+  white-space: nowrap;
+  transition: top 0.16s ease;
+}
+.tl-float-label b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tl-float-label .tl-avatar {
+  flex-basis: 36px;
+  width: 36px;
+  height: 36px;
+  font-size: 14px;
+}
+
+.tl-ruler {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  height: var(--ruler-h);
+  overflow: hidden;
+  border-top: 1px solid var(--line);
+  border-bottom: 4px solid var(--axis);
+  background: var(--panel-solid);
+  pointer-events: none;
+  contain: layout paint;
+  display: none;
+}
+.tl-ruler.show {
+  display: block;
+}
+.tl-ruler-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: var(--ruler-h);
+  transform-origin: 0 0;
+  will-change: transform;
+}
+.tl-ruler .tl-tick span {
+  top: 7px;
+}
+
+.photo-blur {
+  background-size: cover;
+  background-position: center;
+}
+
+.cv-auto > * {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 52px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tl-item,
+  .tl-line,
+  .tl-marker,
+  .tl-float-label {
+    transition: none !important;
+  }
+}
+
+/* Low-end devices: no translucent blur (expensive to paint). */
+.low-end .backdrop-blur-md,
+.low-end .backdrop-blur-sm,
+.low-end .backdrop-blur {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+@keyframes spotlight {
+  from {
+    opacity: 0;
+    scale: 0.85;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
