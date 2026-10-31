@@ -53,6 +53,18 @@ The site is plain static files, so it runs on the free tier with no Functions.
 Do not choose the "Next.js" (full-stack, `@cloudflare/next-on-pages`) preset: this app is a
 static export and needs no server runtime.
 
+### Deploying as a Cloudflare Worker (Workers & Pages → Create application)
+
+`wrangler.jsonc` serves `./out` as static assets, so `npx wrangler deploy` works once the site
+is built. In the Worker's **Settings → Build**:
+
+- Git branch: the branch that holds this code (`main` only after `nextjs-port` is merged)
+- Build command: `npm run build`
+- Deploy command: `npx wrangler deploy` (default)
+- The Worker's name must match `name` in `wrangler.jsonc` (`jw-timeline`).
+
+Node 22 is pinned in `.node-version`.
+
 ## Moving data from the old app
 
 - If the old app was opened on the same web address before, its data is moved in automatically
