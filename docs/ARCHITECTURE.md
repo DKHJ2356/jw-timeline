@@ -5,11 +5,14 @@ Everything still runs on the device: there is no login, no server and no cloud s
 
 ## Stack
 
-- Next.js 15 (App Router) and TypeScript, built as a static export (`output: 'export'`).
+- Next.js 16 (App Router) and TypeScript, built as a static export (`output: 'export'`).
+  (The plan named Next.js 15; 16.4.3 is the current stable release and the 15.x line pulls in a
+  PostCSS version with a published high-severity advisory.)
   The `out/` folder is deployed to Cloudflare Pages as plain files.
 - Tailwind CSS v4. The original CSS variables are theme tokens; dark mode is a `dark` class on `<html>`.
-- Framer Motion through `LazyMotion` + `domAnimation`: modal enter/exit, vertical item drag,
-  gallery swipe, menu pop and marker hover.
+- Framer Motion through `LazyMotion` (`m` components, strict mode). The feature bundle
+  (`domMax`, which adds drag on top of `domAnimation`) is loaded asynchronously after first paint.
+  Used for modal enter/exit, vertical item drag, gallery swipe, menu pop and marker hover.
 - Three small Aceternity-style effects in `components/ui/aceternity/` (animated modal shell,
   animated search placeholder, spotlight on the empty state). They load on demand and are
   switched off on low-end devices.
@@ -24,11 +27,13 @@ app/
   manifest.ts      PWA manifest
   globals.css      Tailwind, tokens, timeline element styles, reduced-motion rules
 components/
-  TimelineApp.tsx  top-level client component: boot, toasts, modal host
+  ClientApp.tsx    loads TimelineApp in the browser only
+  TimelineApp.tsx  top-level client component: boot, saving, toasts, modal host
+  PhotoImg.tsx     stored photo with blurred placeholder
   header/          Toolbar, SearchBox, TypeFilter, MoreMenu, ZoomControls
-  timeline/        TimelineViewport (scroll, wheel/pinch/pan, virtual window), YearAxis,
-                   FloatingAxis, FloatingLabels, PersonItem, CardItem, LifeLine,
-                   LinkedEventMarker, SharedEventConnector
+  timeline/        TimelineViewport (scroll, wheel/pinch/pan, render window, floating ruler),
+                   YearAxis (axis, ticks, ruler ticks), FloatingLabels, items (person/card
+                   item and life line), LinkedEventMarker, SharedEventConnector, EmptyState
   modals/          EntryForm/ (DateField, ColourPicker, PersonLinker, PhotoManager),
                    DetailModal, Gallery, EntryFilterModal, TrashModal, RestoreModal
   ui/aceternity/   animated-modal, placeholders-input, spotlight
@@ -43,7 +48,9 @@ lib/
   backup.ts        .btlbackup read v1 (data URLs) and v1/v2 write v2, safety backup before restore
   csv.ts           CSV export (all text fields) and import
   device.ts        low-end detection
-  sample.ts        demo / sample timeline
+  sample.ts        demo / sample timeline, palette, subtitle presets
+  cleanup.ts       removes photo blobs nothing refers to
+  zoomBus.ts       lets the zoom buttons zoom around the view centre
 public/            icons/, sw.js, _headers
 ```
 

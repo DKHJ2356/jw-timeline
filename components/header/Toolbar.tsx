@@ -22,7 +22,7 @@ export default function Toolbar() {
   const allVisible = visible === entries.length;
 
   return (
-    <header className="sticky top-0 z-30 flex h-[calc(var(--header-h)+env(safe-area-inset-top))] flex-none items-center gap-2 overflow-x-auto border-b border-line bg-panel px-3 pt-[env(safe-area-inset-top)] backdrop-blur-md [scrollbar-width:thin]">
+    <header className="sticky top-0 z-30 flex h-[calc(var(--header-h)+env(safe-area-inset-top))] flex-none items-center gap-2 overflow-x-auto border-b border-line bg-panel px-3 pt-[env(safe-area-inset-top)] backdrop-blur-md [scrollbar-width:thin] [&>*]:flex-none">
       <h1 className="mr-auto whitespace-nowrap text-[17px] font-extrabold sm:text-[19px]">
         <span className="hidden md:inline">My Bible Timeline</span>
         <span className="md:hidden">Timeline</span>

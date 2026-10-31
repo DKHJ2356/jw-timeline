@@ -117,8 +117,8 @@ export default function EntryForm({ id }: { id: number | null }) {
           save();
         }}
       >
-        <div className="grid gap-4 lg:grid-cols-[1.5fr_.9fr]">
-          <section className="section mt-3 flex flex-col">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,.9fr)]">
+          <section className="section mt-3 flex min-w-0 flex-col">
             <div className="flex gap-[7px] overflow-x-auto" role="group" aria-label="Entry type">
               {ENTRY_TYPES.map((t) => (
                 <button key={t} type="button" className={`btn flex-1 ${type === t ? 'btn-active' : ''}`} aria-pressed={type === t} onClick={() => setType(t)}>
@@ -195,7 +195,7 @@ export default function EntryForm({ id }: { id: number | null }) {
             </label>
           </section>
 
-          <aside className="grid content-start gap-3 lg:mt-3">
+          <aside className="grid min-w-0 grid-cols-1 content-start gap-3 lg:mt-3">
             <section className="section">
               <div className="mb-2 flex items-center justify-between">
                 <b>Colour</b>

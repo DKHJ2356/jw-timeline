@@ -413,17 +413,27 @@ export default function TimelineViewport() {
   const onDragEnd = useCallback(
     (id: number, offsetY: number) => {
       const l = live.current.layout.find((v) => v.id === id);
-      setDragging(null);
-      if (!l) return;
-      const top = Math.round(Math.max(DRAG_MIN, Math.min(canvasH - DRAG_BOTTOM, l.baseTop + offsetY)));
-      if (top === l.baseTop) mvFor(id).set(0);
-      else setPosition(id, top);
+      const v = mvFor(id);
+      // Let Framer Motion finish its own drag-end handling first, then commit the new top.
+      requestAnimationFrame(() => {
+        v.stop();
+        setDragging(null);
+        if (!l) return v.set(0);
+        const top = Math.round(Math.max(DRAG_MIN, Math.min(canvasH - DRAG_BOTTOM, l.baseTop + offsetY)));
+        if (top === l.baseTop) v.set(0);
+        else setPosition(id, top);
+      });
     },
     [canvasH, mvFor, setPosition],
   );
   // Once the new position is rendered, clear the drag offset in the same frame.
   useLayoutEffect(() => {
-    for (const [id, v] of mvs) if (id !== dragging && v.get() !== 0) v.set(0);
+    for (const [id, v] of mvs) {
+      if (id !== dragging && v.get() !== 0) {
+        v.stop();
+        v.set(0);
+      }
+    }
   }, [positions, dragging, mvs]);
 
   // ---- scroll to a search result -------------------------------------------
